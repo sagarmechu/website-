@@ -1,0 +1,127 @@
+w<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chart Viewer</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="/site.css">
+  <style>
+    .chart-table td, .chart-table th { text-align:center; }
+    .chart-table .day-header { background:#f5f5f5; width:60px; }
+    .month-header { background:#f0ad4e; color:#fff; font-weight:bold; }
+  </style>
+</head>
+<body>
+  <section class="octoberresultchart">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <h1 id="title">SATTA CHART</h1>
+          <p id="subtitle" class="text-muted"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="newtable">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12 nopadding">
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered table-hover table-condensed chart-table">
+              <thead>
+                <tr>
+                  <td class="table_chart_section forfirtcolor text-center"><b>Date</b></td>
+                  <td class="table_chart_section forfirtcolor text-center month-header">January</td>
+                  <td class="table_chart_section forfirtcolor text-center month-header">February</td>
+                  <td class="table_chart_section forfirtcolor text-center month-header">March</td>
+                  <td class="table_chart_section forfirtcolor text-center month-header">April</td>
+                  <td class="table_chart_section forfirtcolor text-center month-header">May</td>
+                  <td class="table_chart_section forfirtcolor text-center month-header">June</td>
+                  <td class="table_chart_section forfirtcolor text-center month-header">July</td>
+                  <td class="table_chart_section forfirtcolor text-center month-header">August</td>
+                  <td class="table_chart_section forfirtcolor text-center month-header">September</td>
+                  <td class="table_chart_section forfirtcolor text-center month-header">October</td>
+                  <td class="table_chart_section forfirtcolor text-center month-header">November</td>
+                  <td class="table_chart_section forfirtcolor text-center month-header">December</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="13" class="text-center">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>
+    (function(){
+      function q(name){ return new URLSearchParams(location.search).get(name) || ''; }
+      const game = q('game') || 'GALI';
+      const year = q('year') || String(new Date().getFullYear());
+      document.getElementById('subtitle').textContent = game+" "+year;
+      document.title = game+" "+year+" Chart";
+      const table = document.querySelector('.chart-table');
+      const oldTbody = table.tBodies && table.tBodies[0];
+      function pad2(n){ return String(n).padStart(2,'0'); }
+      function safeName(s){ return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); }
+      function buildBody(map){
+        const tbody = document.createElement('tbody');
+        for (let d=1; d<=31; d++){
+          const tr = document.createElement('tr');
+          const th = document.createElement('td');
+          th.className = 'day-header';
+          th.innerHTML = '<b>'+pad2(d)+'</b>';
+          tr.appendChild(th);
+          for (let m=1; m<=12; m++){
+            const td = document.createElement('td');
+            const val = (map[m] && map[m][d]) || '-';
+            td.innerHTML = '<span>'+(val || '-')+'</span>';
+            tr.appendChild(td);
+          }
+          tbody.appendChild(tr);
+        }
+        return tbody;
+      }
+      function renderItems(items){
+        const map = {};
+        for (const it of items){
+          const parts = (it.date||'').split('-');
+          if (parts.length !== 3) continue;
+          const y = parseInt(parts[0],10);
+          const m = parseInt(parts[1],10);
+          const d = parseInt(parts[2],10);
+          if (String(y)!==year || isNaN(m) || isNaN(d)) continue;
+          if (!map[m]) map[m] = {};
+          map[m][d] = it.result || '-';
+        }
+        const newBody = buildBody(map);
+        if (oldTbody) table.replaceChild(newBody, oldTbody); else table.appendChild(newBody);
+      }
+      const jsonUrl = `/data/${safeName(game)}-${encodeURIComponent(year)}.json`;
+      fetch(jsonUrl)
+        .then(r=>{ if(!r.ok) throw new Error('no_prebuilt'); return r.json(); })
+        .then(data=>{ renderItems((data && data.items) || []); })
+        .catch(_=>{
+          // fallback to API
+          fetch(`/api/chart-file?game=${encodeURIComponent(game)}&year=${encodeURIComponent(year)}`)
+            .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+            .then(data=>{ renderItems((data && data.items) || []); })
+            .catch(err=>{
+              const tb = document.createElement('tbody');
+              const tr = document.createElement('tr');
+              const td = document.createElement('td');
+              td.colSpan = 13;
+              td.className = 'text-center';
+              td.textContent = 'Failed to load chart: '+err.message;
+              tr.appendChild(td);
+              tb.appendChild(tr);
+              if (oldTbody) table.replaceChild(tb, oldTbody); else table.appendChild(tb);
+              console.warn('chart load failed', err);
+            });
+        });
+    })();
+  </script>
+</body>
+</html>

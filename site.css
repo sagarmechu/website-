@@ -1,0 +1,30 @@
+/* Minimal, custom CSS replacing Bootstrap/JS dependencies */
+:root{
+  --brand:#ff6633;
+  --bg:#ffffff;
+  --text:#111;
+  --muted:#666;
+  --border:#e5e5e5;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg)}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline}
+.container{max-width:1100px;margin:0 auto;padding:0 16px}
+.header, .footer{padding:16px 0;text-align:center}
+.header h1{color:var(--brand);margin:8px 0 0}
+.header h2{color:var(--brand);margin:8px 0}
+.section{padding:16px 0}
+.card{border:1px dashed red;background:linear-gradient(to bottom,#ffd800,#fff);border-radius:12px;padding:16px;line-height:1.4}
+.table{width:100%;border-collapse:collapse;margin:12px 0}
+.table th,.table td{border:1px solid var(--border);padding:8px;text-align:center}
+.table .yellowStrip{background:#ffeaa7}
+.fon{font-weight:600}
+.text-center{text-align:center}
+.badge{display:inline-block;background:var(--brand);color:#fff;border-radius:12px;padding:2px 8px;font-size:12px}
+.notice{font-size:14px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+.col-12{grid-column:span 12}
+@media(min-width:700px){.col-6{grid-column:span 6}}
+.footer small{color:var(--muted)}

@@ -1,0 +1,840 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: #f4f4f4;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header Styles */
+.header {
+    background: #2c3e50;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    border-bottom: 3px solid #e74c3c;
+}
+
+.navbar {
+    padding: 0.8rem 0;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+}
+
+.nav-item {
+    margin: 0;
+}
+
+.nav-link {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    background: #e74c3c;
+    font-size: 1rem;
+}
+
+.nav-link:hover {
+    background: #c0392b;
+    color: #fff;
+}
+
+/* Description Section with Moving Animation */
+.description-section {
+    background: #2c3e50;
+    padding: 1rem 0;
+    margin-top: 100px; /* account for fixed header */
+    text-align: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.description-section .container {
+    overflow: hidden;
+    position: relative;
+}
+
+.description-section p {
+    color: #fff;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin: 0;
+    white-space: nowrap;
+    animation: marquee 30s linear infinite;
+    display: inline-block;
+    padding-left: 100%;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+/* Main Title Section */
+.main-title {
+    background: #e74c3c;
+    padding: 2rem 0;
+    text-align: center;
+}
+
+.main-title h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #fff;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Live Update Section */
+.live-update {
+    background: #fff;
+    padding: 1.5rem 0;
+    text-align: center;
+    border-bottom: 2px solid #ddd;
+}
+
+.time-display {
+    color: #333;
+}
+
+.time {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #e74c3c;
+    margin: 1rem 0;
+    font-family: 'Courier New', monospace;
+}
+
+.time-display p {
+    color: #666;
+    font-size: 1rem;
+    font-style: italic;
+    margin-top: 1rem;
+}
+
+/* DISAWER Result Section */
+.disawer-result {
+    background: #fff;
+    padding: 2rem 0;
+    text-align: center;
+    border-bottom: 2px solid #ddd;
+}
+
+.result-card h2 {
+    color: #2c3e50;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.result-time {
+    color: #e74c3c;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.result-numbers {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #e74c3c;
+    background: #f8f9fa;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    border: 2px solid #e74c3c;
+}
+
+.result-numbers i {
+    color: #2c3e50;
+    font-size: 1.5rem;
+}
+
+/* Market Timings Section */
+.market-timings {
+    background: #fff;
+    padding: 2rem 0;
+    position: relative;
+    border-bottom: 2px solid #ddd;
+}
+
+.timings-content {
+    text-align: center;
+}
+
+.timings-content h3 {
+    color: #2c3e50;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+}
+
+.khaiwal-name {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 2rem 0;
+}
+
+.khaiwal-name span {
+    color: #e74c3c;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.market-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin: 2rem 0;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.market-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 1.5rem;
+    background: #f8f9fa;
+    border-radius: 5px;
+    color: #333;
+    border-left: 4px solid #e74c3c;
+    font-weight: bold;
+}
+
+.market-name {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.market-time {
+    font-weight: bold;
+    color: #e74c3c;
+}
+
+.payment-section {
+    margin: 2rem 0;
+    padding: 2rem;
+    border-top: 2px solid #ddd;
+    background: #2c3e50;
+    border-radius: 10px;
+    color: #fff;
+}
+
+.payment-section h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #fff;
+    text-align: center;
+}
+
+.payment-section p {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    color: #ecf0f1;
+    text-align: center;
+}
+
+.separator {
+    text-align: center;
+    color: #ecf0f1;
+    font-weight: bold;
+    margin: 1rem 0;
+}
+
+.rates {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: #ecf0f1;
+    border-radius: 10px;
+    color: #2c3e50;
+}
+
+.rates h4 {
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #2c3e50;
+    text-align: center;
+}
+
+.rates p {
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+    text-align: center;
+}
+
+.game-play-section {
+    margin: 2rem 0;
+    padding: 2rem 0;
+    border-top: 2px solid #ddd;
+}
+
+.game-play-section h3 {
+    color: #2c3e50;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.btn {
+    padding: 15px 40px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+
+.btn-primary {
+    background: #e74c3c;
+    color: #fff;
+    border: 2px solid #e74c3c;
+}
+
+.btn-primary:hover {
+    background: #c0392b;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+}
+
+.btn-large {
+    padding: 18px 50px;
+    font-size: 1.3rem;
+}
+
+.refresh-button {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.btn-refresh {
+    background: #3498db;
+    color: #fff;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+.btn-refresh:hover {
+    background: #2980b9;
+}
+
+.btn-refresh i {
+    color: #fff;
+}
+
+/* Results Section */
+.results {
+    background: #f8f9fa;
+    padding: 3rem 0;
+    color: #333;
+}
+
+.results h3 {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: #2c3e50;
+}
+
+.results-table-container {
+    margin-bottom: 3rem;
+}
+
+/* Results table specific styles (screenshot match) */
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+.results-table thead th {
+    background: #000;
+    color: #fff;
+    padding: 10px 8px;
+    font-weight: 700;
+    text-align: center;
+    border: 2px solid #ddd;
+}
+.results-table tbody td {
+    border: 2px solid #ddd;
+    padding: 0;
+    vertical-align: middle;
+}
+.results-table tbody td:first-child {
+    width: 55%;
+}
+.market-cell {
+    background: linear-gradient(180deg,#ffb84d,#ff7a00);
+    padding: 18px 10px;
+    text-align: center;
+    font-weight: 800;
+    color: #111;
+}
+.market-title {
+    font-size: 1rem;
+}
+.market-time {
+    font-size: 0.9rem;
+    margin-top: 6px;
+    font-weight: 600;
+}
+.results-table td.prev,
+.results-table td.today {
+    text-align: center;
+    font-weight: 800;
+    font-size: 1.3rem;
+    background: #fff;
+    min-width: 140px;
+}
+.wait-img {
+    height: 32px;
+    display: inline-block;
+}
+
+@media (max-width: 800px) {
+    .results-table tbody td:first-child {
+        width: 60%;
+    }
+    .market-cell { padding: 12px 8px; }
+}
+
+.results-table {
+    width: 100%;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    color: #333;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid #ddd;
+}
+
+.results-table th {
+    background: #2c3e50;
+    color: #fff;
+    padding: 1rem;
+    text-align: left;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.results-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #ddd;
+    font-size: 0.95rem;
+}
+
+.results-table tr:hover {
+    background: #f8f9fa;
+}
+
+.results-table a {
+    color: #e74c3c;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.results-table a:hover {
+    text-decoration: underline;
+}
+
+.waiting {
+    color: #e74c3c;
+    font-weight: bold;
+    font-style: italic;
+    font-size: 1.2rem;
+}
+
+/* Charts Section */
+.charts {
+    background: #fff;
+    padding: 3rem 0;
+    color: #333;
+    border-bottom: 2px solid #ddd;
+}
+
+.charts h2 {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: #2c3e50;
+}
+
+.chart-container {
+    overflow-x: auto;
+}
+
+.chart-table-wrapper {
+    min-width: 1200px;
+}
+
+.chart-table {
+    width: 100%;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid #ddd;
+}
+
+.chart-table th {
+    background: #2c3e50;
+    color: #fff;
+    padding: 0.8rem 0.5rem;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.chart-table td {
+    padding: 0.6rem 0.5rem;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+    font-size: 0.85rem;
+}
+
+.chart-table tr:hover {
+    background: #f8f9fa;
+}
+
+/* Contact Section */
+.contact {
+    background: #2c3e50;
+    padding: 3rem 0;
+    text-align: center;
+    color: #fff;
+}
+
+.contact-content h3 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #fff;
+}
+
+.contact-content p {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    color: #ecf0f1;
+}
+
+.contact-info h4 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #e74c3c;
+}
+
+.contact-info p {
+    font-size: 1rem;
+    font-style: italic;
+    color: #ecf0f1;
+}
+
+/* About Satta King Section */
+.about-satta {
+    background: #fff;
+    padding: 3rem 0;
+    color: #333;
+    border-bottom: 2px solid #ddd;
+}
+
+.about-satta h2 {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: #2c3e50;
+}
+
+.about-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.about-content h3 {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin: 2rem 0 1rem 0;
+    color: #e74c3c;
+}
+
+.about-content p {
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    color: #555;
+}
+
+.about-content p:first-of-type {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Login Section */
+.login-section {
+    background: #f8f9fa;
+    padding: 3rem 0;
+    color: #333;
+}
+
+.login-section h2 {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: #2c3e50;
+}
+
+.login-form {
+    max-width: 400px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid #ddd;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #e74c3c;
+}
+
+.login-form .btn {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+    margin-top: 1rem;
+}
+
+/* Footer */
+.footer {
+    background: #2c3e50;
+    color: #ecf0f1;
+    padding: 2rem 0;
+    text-align: center;
+    border-top: 3px solid #e74c3c;
+}
+
+.footer p {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .nav-menu {
+        gap: 1rem;
+    }
+    
+    .nav-link {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .main-title h1 {
+        font-size: 2rem;
+    }
+    
+    .result-card h2 {
+        font-size: 1.5rem;
+    }
+    
+    .number {
+        font-size: 2rem;
+    }
+    
+    .khaiwal-name span {
+    font-size: 1.5rem;
+    }
+    
+    .market-list {
+        max-width: 350px;
+    }
+    
+    .market-item {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .payment-section h3 {
+        font-size: 1.3rem;
+    }
+    
+    .results-table {
+        font-size: 0.9rem;
+    }
+    
+    .chart-table-wrapper {
+        min-width: auto;
+    }
+    
+    .about-content {
+        padding: 0 1rem;
+    }
+    
+    .login-form {
+        margin: 0 1rem;
+    }
+    
+    /* Adjust marquee animation for mobile */
+    .description-section p {
+        font-size: 0.8rem;
+        animation-duration: 20s;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .main-title h1 {
+        font-size: 1.8rem;
+    }
+    
+    .time {
+        font-size: 1.5rem;
+    }
+    
+    .result-card h2 {
+        font-size: 1.3rem;
+    }
+    
+    .number {
+        font-size: 1.8rem;
+    }
+    
+    .khaiwal-name {
+        flex-wrap: wrap;
+        gap: 0.3rem;
+    }
+    
+    .khaiwal-name span {
+        font-size: 1.3rem;
+    }
+    
+    .market-list {
+        max-width: 300px;
+    }
+    
+    .market-item {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
+    }
+    
+    .payment-section h3 {
+        font-size: 1.1rem;
+    }
+    
+    .results-table th,
+    .results-table td {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .about-satta h2,
+    .login-section h2 {
+        font-size: 1.5rem;
+    }
+    
+    .about-content h3 {
+        font-size: 1.2rem;
+    }
+    
+    .about-content p {
+        font-size: 0.9rem;
+    }
+    
+    /* Adjust marquee animation for small mobile */
+    .description-section p {
+        font-size: 0.7rem;
+        animation-duration: 15s;
+    }
+}

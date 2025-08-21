@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>A7 Satta King</title>
+  <meta name="description" content="A7 Satta King results and charts">
+</head>
+<body>
+<!-- Admin page has its own controls; site nav will appear inside the iframe preview below -->
+  <div>
+    <div id="form">
+      <input id="user" placeholder="username" autocomplete="username">
+      <input id="password" placeholder="password" type="password" autocomplete="current-password">
+      <button id="login">Login</button>
+    </div>
+    <div id="actions" style="display:none; margin-top:12px">
+      <!-- Actions toolbar removed as requested -->
+      <!-- Results Manager removed as requested -->
+      <div style="margin-top:0; padding-top:0; border-top:0">
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+          <button id="save_homepage">Save</button>
+          <a href="/admin/chart" id="open_chart_editor" class="btn">Chart Editor</a>
+        </div>
+        <div style="margin-top:10px; display:flex; gap:10px">
+          <iframe id="preview" style="width:100%; height:80vh; border:1px solid #ddd"></iframe>
+        </div>
+        <div id="save_status" style="margin-top:6px; color:#555"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+async function check(){
+  try{
+    const r = await fetch('/admin/api/me');
+    const j = await r.json();
+    if (j.loggedIn){
+      document.getElementById('form').style.display='none';
+      document.getElementById('actions').style.display='block';
+      var st = document.getElementById('status'); if (st) st.textContent = 'Logged in as '+j.user;
+    } else {
+      document.getElementById('form').style.display='block';
+      document.getElementById('actions').style.display='none';
+      var st2 = document.getElementById('status'); if (st2) st2.textContent = '';
+    }
+  }catch(e){
+    var st3 = document.getElementById('status'); if (st3) st3.textContent = 'Error: '+e.message;
+  }
+}
+
+document.getElementById('login').addEventListener('click', async ()=>{
+  const user = document.getElementById('user').value;
+  const password = document.getElementById('password').value;
+  const r = await fetch('/admin/login', { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({user,password}) });
+  if (r.ok) { check(); }
+  else {
+    const j = await r.json().catch(()=>({error:'login_failed'}));
+    alert(j.error || 'login failed');
+  }
+});
+
+// Optional logout (button removed from UI)
+(function(){
+  const btn = document.getElementById('logout');
+  if (btn){
+    btn.addEventListener('click', async ()=>{
+      await fetch('/admin/logout', { method:'POST' });
+      check();
+    });
+  }
+})();
+
+// Import button removed
+
+// --- Minimal homepage editor (iframe-based) ---
+let editEnabled = false;
+let navBlocked = false;
+let currentFile = 'index.html';
+const SAVE_WHITELIST = new Set(['index.html','chart.html','contact.html']);
+
+function updateStatus(msg){
+  document.getElementById('save_status').textContent = msg;
+}
+
+function updateSaveButtonState(){
+  const btn = document.getElementById('save_homepage');
+  if (!btn) return;
+  const ok = SAVE_WHITELIST.has(currentFile);
+  btn.disabled = !ok;
+  btn.title = ok ? '' : 'Saving disabled for this page. Only Home, Chart and Contact can be saved from here.';
+}
+
+function getIframeDoc(){
+  const iframe = document.getElementById('preview');
+  return iframe && iframe.contentDocument;
+}
+
+async function loadHomepage(){
+  const iframe = document.getElementById('preview');
+  // Prefer server copy
+  const file = currentFile || 'index.html';
+  currentFile = file;
+  // Reset nav block so we reattach handlers for new document
+  navBlocked = false;
+  iframe.removeAttribute('srcdoc');
+  iframe.src = file === 'index.html' ? '/' : `/${file}`;
+  updateStatus('Loading ' + file + '...');
+}
+
+function preventNavHandlers(doc){
+  if (navBlocked) return;
+  // Prevent clicks on links navigating away while editing
+  function onClick(e){
+    const el = e.target;
+    const a = el.closest && el.closest('a');
+    const reloadAncestor = el.closest && el.closest('[onclick*="location.reload"], #Refresh');
+    if (reloadAncestor){ e.preventDefault(); e.stopPropagation(); return; }
+    if (a && a.href){
+      // same-origin only
+      try{
+        const url = new URL(a.href, window.location.origin);
+        if (url.origin === window.location.origin){
+          e.preventDefault();
+          e.stopPropagation();
+          const path = url.pathname || '/';
+          // Map routes to files
+          let file = 'index.html';
+          if (path === '/' || path === '/index.html') file = 'index.html';
+          else if (path === '/contact' || path === '/contact/') file = 'contact.html';
+          else if (path === '/login' || path === '/login/') file = 'index.html';
+          else if (path === '/yearsChart' || path === '/yearsChart/' || path === '/chart.html') file = 'chart.html';
+          else if (/^\/chart-.*\.html$/i.test(path)) file = path.replace(/^\//,'');
+          else if (/^\/static\/.+\.html$/i.test(path)) file = path.replace(/^\//,'');
+          // Load chosen file inside iframe
+          currentFile = file;
+          updateSaveButtonState();
+          const iframe = document.getElementById('preview');
+          navBlocked = false; // new doc => reattach later
+          iframe.removeAttribute('srcdoc');
+          iframe.src = file === 'index.html' ? '/' : `/${file}`;
+          updateStatus('Navigated to ' + file);
+          return;
+        }
+      }catch(_){}
+      // external or invalid => block
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }
+  doc.addEventListener('click', onClick, true);
+  // Prevent form submissions
+  doc.addEventListener('submit', (e)=>{ e.preventDefault(); e.stopPropagation(); }, true);
+  navBlocked = true;
+}
+
+function enableEditMode(){
+  const doc = getIframeDoc();
+  if (!doc) return;
+  editEnabled = true;
+  doc.body.setAttribute('contenteditable', 'true');
+  // Inject helper styles
+  let style = doc.getElementById('admin-edit-style');
+  if (!style){
+    style = doc.createElement('style');
+    style.id = 'admin-edit-style';
+    style.textContent = `
+      *:focus { outline: 2px dashed #4a90e2 !important; outline-offset: 2px; }
+      body { cursor: text; }
+    `;
+    doc.head.appendChild(style);
+  }
+  preventNavHandlers(doc);
+  // Neutralize common reloaders (e.g., Refresh button in homepage)
+  doc.querySelectorAll('[onclick*="location.reload"], #Refresh').forEach(btn=>{
+    btn.setAttribute('data-admin-disabled', 'true');
+    btn.setAttribute('onclick', '');
+    if (btn.tagName === 'INPUT' || btn.tagName === 'BUTTON'){
+      btn.addEventListener('click', (ev)=>{ ev.preventDefault(); ev.stopPropagation(); }, true);
+    }
+  });
+  // Install shortcut: typing '*w' then Enter inserts the wait.gif snippet
+  installWaitShortcut(doc);
+  updateStatus('Edit mode enabled');
+}
+
+function installWaitShortcut(doc){
+  function onKeyDown(e){
+    if (e.key !== 'Enter') return;
+    const sel = doc.getSelection && doc.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
+    const cur = sel.getRangeAt(0);
+    // Peek 2 chars before caret in the same node
+    try{
+      const probe = cur.cloneRange();
+      const startNode = probe.startContainer;
+      const startOffset = probe.startOffset;
+      if (startNode.nodeType === Node.TEXT_NODE && startOffset >= 2){
+        probe.setStart(startNode, startOffset - 2);
+        const txt = probe.toString();
+        if (txt === '*w'){
+          e.preventDefault();
+          // Delete the '*w'
+          const del = cur.cloneRange();
+          del.setStart(startNode, startOffset - 2);
+          del.deleteContents();
+          // Insert <strong class="waitimg"><img src="/uploads/wait.gif" class="img-responsive" width="50" height="50"></strong>
+          const strong = doc.createElement('strong');
+          strong.className = 'waitimg';
+          const img = doc.createElement('img');
+          img.src = '/uploads/wait.gif';
+          img.className = 'img-responsive';
+          img.width = 50; img.height = 50;
+          strong.appendChild(img);
+          // Insert node at caret
+          const insertRange = sel.getRangeAt(0);
+          insertRange.insertNode(strong);
+          // Move caret after the inserted node
+          sel.removeAllRanges();
+          const after = doc.createRange();
+          after.setStartAfter(strong);
+          after.setEndAfter(strong);
+          sel.addRange(after);
+        }
+      }
+    }catch(_){ /* noop */ }
+  }
+  doc.addEventListener('keydown', onKeyDown, true);
+}
+
+function serializeIframeHtml(){
+  const doc = getIframeDoc();
+  if (!doc) return '';
+  // Ensure we don't persist edit attributes
+  doc.body.removeAttribute('contenteditable');
+  const style = doc.getElementById('admin-edit-style');
+  if (style) style.remove();
+  const html = '<!doctype html>\n' + doc.documentElement.outerHTML;
+  if (editEnabled) doc.body.setAttribute('contenteditable','true'); // restore for UX
+  if (style) {
+    // re-add style only for live session
+    const s = doc.createElement('style'); s.id='admin-edit-style'; s.textContent = style.textContent; doc.head.appendChild(s);
+  }
+  return html;
+}
+
+async function saveHomepage(){
+  const html = serializeIframeHtml();
+  if (!html){ alert('Nothing to save'); return; }
+  const body = { file: currentFile || 'index.html', html };
+  const r = await fetch('/admin/api/page', { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(body) });
+  if (!r.ok){ const j = await r.json().catch(()=>({})); alert(j.error||'Save failed'); return; }
+  updateStatus('Saved at ' + new Date().toLocaleString());
+}
+document.getElementById('save_homepage').addEventListener('click', saveHomepage);
+
+// Optional tab buttons (removed from UI, keep guards for safety)
+(function(){
+  const th = document.getElementById('tab_home');
+  const tc = document.getElementById('tab_chart');
+  const tct = document.getElementById('tab_contact');
+  if (th) th.addEventListener('click', ()=>{ currentFile = 'index.html'; loadHomepage(); });
+  if (tc) tc.addEventListener('click', ()=>{ currentFile = 'chart.html'; loadHomepage(); });
+  if (tct) tct.addEventListener('click', ()=>{ currentFile = 'contact.html'; loadHomepage(); });
+})();
+
+// When iframe loads, enable edit mode
+document.getElementById('preview').addEventListener('load', ()=>{
+  const doc = getIframeDoc();
+  if (!doc) return;
+  enableEditMode();
+  updateStatus('Homepage loaded');
+});
+
+// Minimal flow: no unload warning
+
+// after check() shows actions, initialize editor
+const origCheck = check;
+check = async function(){
+  await origCheck();
+  if (document.getElementById('actions').style.display==='block'){
+    loadHomepage();
+  }
+}
+
+check();
+</script>
+
+</body>
+</html>

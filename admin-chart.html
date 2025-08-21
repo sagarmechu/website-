@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin Chart Editor</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="/site.css">
+  <style>
+    .chart-table td, .chart-table th { text-align:center; }
+    .chart-table .day-header { background:#f5f5f5; width:60px; }
+    .month-header { background:#f0ad4e; color:#fff; font-weight:bold; }
+    input.result-input { width: 56px; text-align:center; padding:2px 4px; }
+    .controls { margin: 12px 0; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Admin Chart Editor</h2>
+    <p id="auth_status" class="text-muted"></p>
+    <div class="controls">
+      <label>Game <input id="game" value="AGRA" style="width:160px" class="form-control"></label>
+      <label>Year <input id="year" value="2025" style="width:100px" class="form-control"></label>
+      <button id="load" class="btn btn-primary">Load</button>
+      <button id="save" class="btn btn-success">Save</button>
+      <label style="margin-left:8px">New Year <input id="new_year" placeholder="YYYY" style="width:100px" class="form-control"></label>
+      <button id="add_year" class="btn btn-warning" title="Create files for the given year for this game">Add Year</button>
+      <button id="next_year" class="btn btn-default" title="Set to next year">+1 Year</button>
+      <a href="/admin" class="btn btn-default">Back to Admin</a>
+      <span id="status" class="text-info" style="margin-left:8px"></span>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered table-hover table-condensed chart-table" id="chart">
+        <thead>
+          <tr>
+            <td class="table_chart_section forfirtcolor text-center"><b>Date</b></td>
+            <td class="table_chart_section forfirtcolor text-center month-header">January</td>
+            <td class="table_chart_section forfirtcolor text-center month-header">February</td>
+            <td class="table_chart_section forfirtcolor text-center month-header">March</td>
+            <td class="table_chart_section forfirtcolor text-center month-header">April</td>
+            <td class="table_chart_section forfirtcolor text-center month-header">May</td>
+            <td class="table_chart_section forfirtcolor text-center month-header">June</td>
+            <td class="table_chart_section forfirtcolor text-center month-header">July</td>
+            <td class="table_chart_section forfirtcolor text-center month-header">August</td>
+            <td class="table_chart_section forfirtcolor text-center month-header">September</td>
+            <td class="table_chart_section forfirtcolor text-center month-header">October</td>
+            <td class="table_chart_section forfirtcolor text-center month-header">November</td>
+            <td class="table_chart_section forfirtcolor text-center month-header">December</td>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+<script>
+(async function(){
+  // Ensure admin session
+  try{
+    const r = await fetch('/admin/api/me');
+    const j = await r.json();
+    if (!j.loggedIn){ location.href = '/admin'; return; }
+    document.getElementById('auth_status').textContent = 'Logged in as '+j.user;
+  }catch(e){ document.getElementById('auth_status').textContent = 'Auth check failed'; }
+
+  function pad2(n){ return String(n).padStart(2,'0'); }
+  function buildGrid(){
+    const tb = document.getElementById('tbody');
+    tb.innerHTML = '';
+    for (let d=1; d<=31; d++){
+      const tr = document.createElement('tr');
+      const th = document.createElement('td');
+      th.className = 'day-header';
+      th.innerHTML = '<b>'+pad2(d)+'</b>';
+      tr.appendChild(th);
+      for (let m=1; m<=12; m++){
+        const td = document.createElement('td');
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.className = 'result-input form-control';
+        inp.setAttribute('data-m', m);
+        inp.setAttribute('data-d', d);
+        td.appendChild(inp);
+        tr.appendChild(td);
+      }
+      tb.appendChild(tr);
+    }
+  }
+
+  function fill(items, year){
+    const byMD = new Map();
+    for (const it of (items||[])){
+      const parts = (it.date||'').split('-');
+      if (parts.length!==3) continue;
+      const y = parts[0]; const m = parseInt(parts[1],10); const d = parseInt(parts[2],10);
+      if (String(y)!==String(year) || isNaN(m)||isNaN(d)) continue;
+      byMD.set(m+','+d, it.result||'');
+    }
+    document.querySelectorAll('input.result-input').forEach(inp=>{
+      const m = parseInt(inp.getAttribute('data-m'),10);
+      const d = parseInt(inp.getAttribute('data-d'),10);
+      inp.value = byMD.get(m+','+d) || '';
+    });
+  }
+
+  function collect(game, year){
+    const items = [];
+    document.querySelectorAll('input.result-input').forEach(inp=>{
+      const m = parseInt(inp.getAttribute('data-m'),10);
+      const d = parseInt(inp.getAttribute('data-d'),10);
+      const val = (inp.value||'').trim();
+      if (!val) return;
+      const date = `${year}-${pad2(m)}-${pad2(d)}`;
+      items.push({ date, result: val, game });
+    });
+    return items;
+  }
+
+  async function load(){
+    const game = document.getElementById('game').value.trim();
+    const year = document.getElementById('year').value.trim();
+    if (!game || !/^\d{4}$/.test(year)){ alert('Enter valid game and 4-digit year'); return; }
+    document.getElementById('status').textContent = 'Loading...';
+    const r = await fetch(`/admin/api/chart-data?game=${encodeURIComponent(game)}&year=${encodeURIComponent(year)}`);
+    const j = await r.json().catch(()=>({items:[]}));
+    if (!r.ok){ alert(j.error||'Load failed'); document.getElementById('status').textContent=''; return; }
+    buildGrid();
+    fill(j.items||[], year);
+    document.getElementById('status').textContent = `Loaded ${(j.items||[]).length} rows`;
+  }
+
+  async function save(){
+    const game = document.getElementById('game').value.trim();
+    const year = document.getElementById('year').value.trim();
+    if (!game || !/^\d{4}$/.test(year)){ alert('Enter valid game and 4-digit year'); return; }
+    const items = collect(game, year);
+    document.getElementById('status').textContent = 'Saving...';
+    const r = await fetch('/admin/api/chart-data', { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ game, year, items }) });
+    const j = await r.json().catch(()=>({}));
+    if (!r.ok){ alert(j.error||'Save failed'); document.getElementById('status').textContent=''; return; }
+    document.getElementById('status').textContent = `Saved ${j.saved} rows`;
+  }
+
+  document.getElementById('load').addEventListener('click', load);
+  document.getElementById('save').addEventListener('click', save);
+  document.getElementById('next_year').addEventListener('click', ()=>{
+    const y = parseInt(document.getElementById('year').value||'',10);
+    if (isNaN(y)) { alert('Set current Year first'); return; }
+    document.getElementById('year').value = String(y+1);
+    buildGrid();
+  });
+  document.getElementById('add_year').addEventListener('click', async ()=>{
+    const game = document.getElementById('game').value.trim();
+    let y = (document.getElementById('new_year').value||'').trim();
+    if (!y){
+      const curr = parseInt(document.getElementById('year').value||'',10);
+      if (!isNaN(curr)) y = String(curr+1);
+    }
+    if (!game || !/^\d{4}$/.test(y)){ alert('Enter Game and valid New Year (YYYY)'); return; }
+    if (!confirm(`Create/init ${game} for year ${y}?`)) return;
+    document.getElementById('year').value = y;
+    buildGrid(); // clear inputs for the new year
+    // Save with zero or current entries (empty grid means zero) just to create files
+    document.getElementById('status').textContent = 'Creating year files...';
+    const items = []; // empty dataset
+    const r = await fetch('/admin/api/chart-data', { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ game, year: y, items }) });
+    const j = await r.json().catch(()=>({}));
+    if (!r.ok){ alert(j.error||'Init failed'); document.getElementById('status').textContent=''; return; }
+    document.getElementById('status').textContent = `Initialized ${game} ${y}`;
+  });
+  buildGrid();
+})();
+</script>
+</body>
+</html>
