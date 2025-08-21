@@ -1,0 +1,16 @@
+{
+  "source": "https://lucky-satta.com/",
+  "listSelector": "", 
+  "mappings": {
+    "game": "",
+    "result": "",
+    "time": "",
+    "date": ""
+  },
+  "charts": [
+  "https://lucky-satta.com/chart/8/2025",
+  "https://lucky-satta.com/chart/2/2025",
+  "https://lucky-satta.com/yearsChart"
+  ],
+  "notes": "This sample config uses generic table parsing. For higher accuracy, set listSelector and mappings to match your site's DOM."
+}
